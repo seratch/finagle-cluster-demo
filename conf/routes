@@ -1,0 +1,20 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /                           controllers.Application.index
+
+# The clock Comet stream
+GET     /servers/start              controllers.Application.startServer(port: Int)
+GET     /servers/stop               controllers.Application.stopServer(port: Int)
+GET     /servers/status             controllers.Application.serverStatus(port: Int)
+GET     /comet/servers              controllers.Application.monitoringServers
+GET     /comet/client               controllers.Application.monitoringClient
+GET     /comet/messages             controllers.Application.monitoringMessages
+GET     /client/start               controllers.Application.startClient(sleep: Long)
+GET     /client/stop                controllers.Application.stopClient
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.at(path="/public", file)
+

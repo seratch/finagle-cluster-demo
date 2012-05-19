@@ -1,0 +1,172 @@
+@main {
+
+        <script type="text/javascript" charset="utf-8">
+            var monitoringServersCallback = function(msg) {
+            $('#monitoringServers').html(msg);
+            }
+            var monitoringClientCallback = function(msg) {
+            $('#monitoringClient').html(msg);
+            }
+            var monitoringMessagesCallback = function(msg) {
+            $('#monitoringMessages').html(msg);
+            }
+        </script>
+        <iframe id="comet1" src="@routes.Application.monitoringServers.unique" style="height:0px;width:0px;visibility:hidden"></iframe>
+        <iframe id="comet2" src="@routes.Application.monitoringClient.unique" style="height:0px;width:0px;visibility:hidden"></iframe>
+        <iframe id="comet3" src="@routes.Application.monitoringMessages.unique" style="height:0px;width:0px;visibility:hidden"></iframe>
+
+        <h1>Finagle ZooKeeperServerSetCluster demo by @@seratch</h1>
+        <hr/>
+        <p> 2012/05/19 at Twitter Japan @@yakitori #finagle_hack</p>
+
+        <h2>Messages</h2>
+        <hr/>
+        <span id="monitoringMessages"></span>
+
+        <h2>Servers</h2>
+        <hr/>
+        <span id="monitoringServers"></span>
+
+        <h2>Client error</h2>
+        <hr/>
+        <span id="monitoringClient"></span>
+
+        <h2>Server Controller</h2>
+        <hr/>
+
+        <table class="table">
+            <tr>
+                <td>http://localhost:9091</td>
+                <td>
+                    <span id="localhost_9091_status"></span>
+                </td>
+                <td>
+                    <a href="#" onclick="return startServer(9091);">start</a>&nbsp;
+                </td>
+                <td>
+                    <a href="#" onclick="return stopServer(9091);">stop</a>&nbsp;
+                </td>
+            </tr>
+            <tr>
+                <td>http://localhost:9092</td>
+                <td>
+                    <span id="localhost_9092_status"></span>
+                </td>
+                <td>
+                    <a href="#" onclick="return startServer(9092);">start</a>&nbsp;
+                </td>
+                <td>
+                    <a href="#" onclick="return stopServer(9092);">stop</a>&nbsp;
+                </td>
+            </tr>
+            <tr>
+                <td>http://localhost:9093</td>
+                <td>
+                    <span id="localhost_9093_status"></span>
+                </td>
+                <td>
+                    <a href="#" onclick="return startServer(9093);">start</a>&nbsp;
+                </td>
+                <td>
+                    <a href="#" onclick="return stopServer(9093);">stop</a>&nbsp;
+                </td>
+            </tr>
+            <tr>
+                <td>http://localhost:9094</td>
+                <td>
+                    <span id="localhost_9094_status"></span>
+                </td>
+                <td>
+                    <a href="#" onclick="return startServer(9094);">start</a>&nbsp;
+                </td>
+                <td>
+                    <a href="#" onclick="return stopServer(9094);">stop</a>&nbsp;
+                </td>
+            </tr>
+            <tr>
+                <td>http://localhost:9095</td>
+                <td>
+                    <span id="localhost_9095_status"></span>
+                </td>
+                <td>
+                    <a href="#" onclick="return startServer(9095);">start</a>&nbsp;
+                </td>
+                <td>
+                    <a href="#" onclick="return stopServer(9095);">stop</a>&nbsp;
+                </td>
+            </tr>
+        </table>
+
+        <h2>Client Controller</h2>
+        <hr/>
+
+        <table class="table">
+            <tr>
+                <td>Sending 100 HTTP requests per second</td>
+                <td>
+                    <a href="#" onclick="return startClient(10);">start</a>&nbsp;
+                </td>
+                <td>
+                    <a href="#" onclick="return stopClient();">stop</a>&nbsp;
+                </td>
+            </tr>
+        </table>
+
+        <script>
+
+            function monitoringServerStatus(port) {
+                $.ajax({
+                    type: 'GET',
+                    cache: false,
+                    url: '/servers/status?port=' + port,
+                    success: function(res) {
+                        $('#localhost_' + port + '_status').html(res);
+                    }
+                });
+                return false;
+            }
+            $(function(){
+                setInterval(function(){
+                    monitoringServerStatus(9091);
+                    monitoringServerStatus(9092);
+                    monitoringServerStatus(9093);
+                    monitoringServerStatus(9094);
+                    monitoringServerStatus(9095);
+                },1000);
+            });
+
+            function startServer(port) {
+                $.ajax({
+                    type: 'GET',
+                    cache: false,
+                    url: '/servers/start?port=' + port
+                });
+                return false;
+            }
+            function stopServer(port) {
+                $.ajax({
+                    type: 'GET',
+                    cache: false,
+                    url: '/servers/stop?port=' + port
+                });
+                return false;
+            }
+            function startClient(sleep) {
+                $.ajax({
+                    type: 'GET',
+                    cache: false,
+                    url: '/client/start?sleep=' + sleep
+                });
+                return false;
+            }
+            function stopClient() {
+                $.ajax({
+                    type: 'GET',
+                    cache: false,
+                    url: '/client/stop'
+                });
+                return false;
+            }
+        </script>
+
+}
