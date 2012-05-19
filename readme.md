@@ -2,7 +2,7 @@
 
 Finagle Hack-a-thon at Twitter Japan @yakitori.
 
-![screen shot](https://github.com/seratch/finagle-cluster-demo/master/scrren_shot.png)
+![screen shot](https://github.com/seratch/finagle-cluster-demo/raw/master/screen_shot.png)
 
 # Requirement
 
