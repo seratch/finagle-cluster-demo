@@ -45,23 +45,18 @@ object Client {
   def clientExecutor(sleep: Long) = new Runnable {
     def run() {
       while (true) {
-        try {
-          var messageId = nextMessageId
-          val req = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/")
-          req.setHeader("X-MESSAGE-ID", messageId)
-          client.apply(req) onSuccess {
-            res => log.debug("Succceded: " + messageId)
-          } onFailure {
-            error =>
-              MessageStore.setAsFailure(messageId, error.getMessage)
-              ClientSubject.notifyObservers(ClientEvent(error.getMessage))
-              log.warn("Failed to send message (" + messageId + ") becuase of " + error)
-          }
-          Thread.sleep(sleep)
-        } catch {
-          case interrupt: InterruptedException => Thread.interrupted()
-          case e => log.error("Client error!", e)
+        var messageId = nextMessageId
+        val req = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/")
+        req.setHeader("X-MESSAGE-ID", messageId)
+        client.apply(req) onSuccess {
+          res => log.debug("Succceded: " + messageId)
+        } onFailure {
+          error =>
+            MessageStore.setAsFailure(messageId, error.getMessage)
+            ClientSubject.notifyObservers(ClientEvent(error.getMessage))
+            log.warn("Failed to send message (" + messageId + ") becuase of " + error)
         }
+        Thread.sleep(sleep)
       }
     }
   }
