@@ -2,22 +2,45 @@
 
 Finagle Hack-a-thon at Twitter Japan @yakitori.
 
+## Demo
+
+Check the YouTube video.
+
+http://youtu.be/D-ATODSQCzo
+
+screenshot:
+
 ![screen shot](https://github.com/seratch/finagle-cluster-demo/raw/master/screen_shot.png)
+
 
 # Requirement
 
-- Play framework 2.0
+- Apache ZooKeeper 3.4.3
+
+ZooKeeper should be already runnning at localhost:2181.
+
+```
+brew install zookeeper
+cp -p /usr/local/etc/zookeeper/zoo_sample.cfg /usr/local/etc/zookeeper/zoo.cfg
+sudo zkServer start
+```
+
+- Play! framework 2.0.1
 
 ```
 brew install play
 ```
 
-- Apache ZooKeeper
+
+# How to run?
+
+- play run
 
 ```
-brew install zookeeper
+git clone git://github.com/seratch/finagle-cluster-demo.git
+cd finagle-cluster-demo
+play start
 ```
 
-Should be already runnning at localhost:2181.
-
+And then, access http://localhost:9000/ from your browser.
 
