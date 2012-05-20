@@ -6,7 +6,7 @@ Finagle Hack-a-thon at Twitter Japan @yakitori.
 
 Check the YouTube video.
 
-http://youtu.be/D-ATODSQCzo
+http://youtu.be/mlbJQziTJTk
 
 screenshot:
 
