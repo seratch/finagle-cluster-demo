@@ -31,6 +31,7 @@ object Client {
       .cluster(serverSetCluster)
       .hostConnectionLimit(1) // TODO testing
       .codec(Http())
+      .retries(5)
       .build()
     clientThread = new Thread(clientExecutor(sleep))
     clientThread.start()
