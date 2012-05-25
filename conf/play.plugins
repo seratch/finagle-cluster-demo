@@ -1,2 +1,2 @@
-777:scalikejdbc.PlayPlugin
-
+100:scalikejdbc.PlayPlugin
+200:DatabaseInitializer
