@@ -5,14 +5,17 @@ import play.api.mvc._
 
 import play.api.libs.Comet
 import play.api.libs.iteratee._
-import play.api.libs.concurrent._
+import play.api.libs.concurrent.{ Promise => PlayPromise, _ }
 
 import java.net._
 
-import akka.util.duration._
 import com.twitter.common.zookeeper._
-import com.twitter.common.quantity.{Time, Amount}
+import com.twitter.common.quantity.{ Time, Amount }
 import com.twitter.finagle.zookeeper._
+
+import scala.concurrent._
+import ExecutionContext.Implicits.global
+import scala.concurrent.duration._
 
 import finagle._
 import models._
@@ -47,7 +50,7 @@ object Application extends Controller {
       localhostServers.update(name, server)
       serverSetCluster.join(server.address)
     } catch {
-      case e =>
+      case e: Exception =>
     }
     Ok("Started!")
   }
@@ -79,62 +82,58 @@ object Application extends Controller {
   // ---------------------------------
   // comet
 
-  val _monitoringServers = Enumerator.fromCallback {
-    () =>
-      val serverObserver = new ServerObserver
-      ServerSubject.addObserver(serverObserver)
-      Thread.sleep(500L)
-      ServerSubject.removeObserver(serverObserver)
-      val result = "<table class=\"table\">" + serverObserver.events.groupBy {
-        event => event.server
-      }.map {
-        case
-          (server, events) => "<tr><td>" + server + "</td>" + events.map {
-          event => "<td>" + event.id + "</td>"
-        }.mkString
-      }.mkString + "</table>"
-      Promise.timeout(Some(result), 0 milliseconds)
+  val _monitoringServers = Enumerator.generateM {
+    val serverObserver = new ServerObserver
+    ServerSubject.addObserver(serverObserver)
+    Thread.sleep(500L)
+    ServerSubject.removeObserver(serverObserver)
+    val result = "<table class=\"table\">" + serverObserver.events.groupBy {
+      event => event.server
+    }.map {
+      case (server, events) => "<tr><td>" + server + "</td>" + events.map {
+        event => "<td>" + event.id + "</td>"
+      }.mkString
+    }.mkString + "</table>"
+    PlayPromise.timeout(Some(result), 0 milliseconds)
   }
 
   def monitoringServers = Action {
     Ok.stream(_monitoringServers &> Comet(callback = "parent.monitoringServersCallback"))
   }
 
-  val _monitoringClient = Enumerator.fromCallback {
-    () =>
-      val clientObserver = new ClientObserver
-      ClientSubject.addObserver(clientObserver)
-      Thread.sleep(2000)
-      val result = "<table class=\"table\">" + clientObserver.events.map {
-        event =>
-          "<tr><td>" + event.message + "</td></tr>"
-      }.mkString + "</table>"
-      ClientSubject.removeObserver(clientObserver)
-      Promise.timeout(Some(result), 0 milliseconds)
+  val _monitoringClient = Enumerator.generateM {
+    val clientObserver = new ClientObserver
+    ClientSubject.addObserver(clientObserver)
+    Thread.sleep(2000)
+    val result = "<table class=\"table\">" + clientObserver.events.map {
+      event =>
+        "<tr><td>" + event.message + "</td></tr>"
+    }.mkString + "</table>"
+    ClientSubject.removeObserver(clientObserver)
+    PlayPromise.timeout(Some(result), 0 milliseconds)
   }
 
   def monitoringClient = Action {
     Ok.stream(_monitoringClient &> Comet(callback = "parent.monitoringClientCallback"))
   }
 
-  lazy val _monitoringMessages = Enumerator.fromCallback {
-    () =>
-      val result =
-        try {
-          val allCount = MessageStore.all
-          val failureCount = MessageStore.failures
-          val successRate = (allCount - failureCount).toDouble / allCount.toDouble * 100
-          "<table class=\"table\">" +
-            "<tr><td>All</td><td>" + allCount + "</td>" +
-            "<tr><td>Failures</td><td>" + failureCount + "</td>" +
-            "<tr><td>Rate</td><td>" + "%.3f".format(successRate) + "%</td>" +
-            "</table>"
-        } catch {
-          case e =>
-            log.error("Failed to count messages.", e)
-            "--- Oops! ---"
-        }
-      Promise.timeout(Some(result), 100 milliseconds)
+  lazy val _monitoringMessages = Enumerator.generateM {
+    val result =
+      try {
+        val allCount = MessageStore.all
+        val failureCount = MessageStore.failures
+        val successRate = (allCount - failureCount).toDouble / allCount.toDouble * 100
+        "<table class=\"table\">" +
+          "<tr><td>All</td><td>" + allCount + "</td>" +
+          "<tr><td>Failures</td><td>" + failureCount + "</td>" +
+          "<tr><td>Rate</td><td>" + "%.3f".format(successRate) + "%</td>" +
+          "</table>"
+      } catch {
+        case e: Exception =>
+          log.error("Failed to count messages.", e)
+          "--- Oops! ---"
+      }
+    PlayPromise.timeout(Some(result), 100 milliseconds)
   }
 
   def monitoringMessages = Action {

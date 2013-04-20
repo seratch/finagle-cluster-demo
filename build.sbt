@@ -1,2 +1,4 @@
-seq(scalikejdbcSettings: _*)
+scalikejdbcSettings
+
+scalariformSettings
 

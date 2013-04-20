@@ -15,14 +15,14 @@ case class HttpServer(name: String, port: Int) {
     .bindTo(address)
     .name(name)
     .build(new Service[HttpRequest, HttpResponse] {
-    def apply(req: HttpRequest) = {
-      Option(req.getHeader("X-MESSAGE-ID")).map {
-        messageId =>
-          ServerSubject.notifyObservers(ServerEvent(messageId.toLong, name, System.currentTimeMillis))
+      def apply(req: HttpRequest) = {
+        Option(req.getHeader("X-MESSAGE-ID")).map {
+          messageId =>
+            ServerSubject.notifyObservers(ServerEvent(messageId.toLong, name, System.currentTimeMillis))
+        }
+        Future(new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK))
       }
-      Future(new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK))
-    }
-  })
+    })
 
   var isRunning = true
 

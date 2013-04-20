@@ -55,3 +55,4 @@ build.log
 .DS_Store
 derby.log
 
+logs

@@ -4,7 +4,7 @@ import models.MessageStore
 import com.twitter.finagle.http.Http
 import com.twitter.finagle.Service
 import org.jboss.netty.handler.codec.http._
-import com.twitter.finagle.builder.{Cluster, ClientBuilder}
+import com.twitter.finagle.builder.{ Cluster, ClientBuilder }
 import java.net.SocketAddress
 import play.api.Logger
 
@@ -26,7 +26,7 @@ object Client {
   var client: Service[HttpRequest, HttpResponse] = null
   var clientThread: Thread = null
 
-  def start(serverSetCluster: Cluster[SocketAddress], sleep:Long) = {
+  def start(serverSetCluster: Cluster[SocketAddress], sleep: Long) = {
     client = ClientBuilder()
       .cluster(serverSetCluster)
       .hostConnectionLimit(1) // TODO testing
