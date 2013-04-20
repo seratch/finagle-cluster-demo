@@ -7,25 +7,25 @@ class DatabaseInitializer(app: Application) extends Plugin {
   override def onStart() {
     DB autoCommit { implicit session =>
       try {
-        sql"SELECT COUNT(1) FROM MESSAGE".map(_.long(1)).single.apply()
+        sql"select count(1) from message".map(_.long(1)).single.apply()
       } catch {
         case e: Exception =>
 
           sql"""
-         CREATE TABLE MESSAGE (
-           ID BIGINT PRIMARY KEY NOT NULL,
-           SERVER_NAME VARCHAR(16),
-           CURRENT_STATUS VARCHAR(16) NOT NULL
-         );
+         create table message (
+           id bigint primary key not null,
+           server_name varchar(16),
+           current_status varchar(16) not null
+         )
          """.execute.apply()
 
           sql"""
-         CREATE TABLE MESSAGE_HISTORY (
-           ID BIGINT GENERATED ALWAYS AS IDENTITY,
-           MESSAGE_ID BIGINT NOT NULL,
-           STATUS VARCHAR(16) NOT NULL,
-           SERVER_NAME VARCHAR(16),
-           ERROR_MESSAGE VARCHAR(256)
+         create table message_history (
+           id bigint generated always as identity,
+           message_id bigint not null,
+           status varchar(16) not null,
+           server_name varchar(16),
+           error_message varchar(256)
          );
          """.execute.apply()
       }

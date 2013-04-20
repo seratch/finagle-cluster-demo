@@ -61,7 +61,7 @@ object Message extends SQLSyntaxSupport[Message] {
     sql"""
       update ${Message.as(m)} 
       set 
-        ${m.id} = ${e.id}
+        ${m.id} = ${e.id},
         ${m.serverName} = ${e.serverName},
         ${m.currentStatus} = ${e.currentStatus}
       where 
